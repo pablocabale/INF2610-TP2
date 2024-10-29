@@ -1,0 +1,7 @@
+Question de comprehension:
+1. Supposez que vous faites passer le nombre de processus de N à N + δ, où N correspond au nombre de
+coeurs disponibles. Quel sera l’impact de ce changement sur la performance de l’algorithme?
+
+- Ajouter plus de processus que le nombre de coeurs va empirer la performance de l'algorithme.
+Les processus extras doivent attendre leur tour ce qui enleve les avantages au parallelisme puis
+consomment plus de temps CPU.
