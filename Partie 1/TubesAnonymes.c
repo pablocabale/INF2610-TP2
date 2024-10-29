@@ -65,6 +65,8 @@ int main() {
         } else if (cmp == 1) {
             printf("Les fichiers sont différents\n");
         }
+    } else {
+        printf("Erreur avec cmp\n");
     }
 
     return 0;
