@@ -1,18 +1,18 @@
 #include "merge_sort.h"
 
 int main(int argc, char *argv[]) {
-    if (argc != 3) {
-        fprintf(stderr, "Usage: %s <array_size> <num_processes>\n", argv[0]);
-        exit(1);
-    }
+    // if (argc != 3) {
+    //     fprintf(stderr, "Usage: %s <array_size> <num_processes>\n", argv[0]);
+    //     exit(1);
+    // }
     
-    /* Populate the array to test the sort */
-    srand(time(NULL));
-    for (int i = 0; i < array_size; i++) {
-        shared_data->array[i] = rand() % MAX_NUM_SIZE;
-    }
+    // /* Populate the array to test the sort */
+    // srand(time(NULL));
+    // for (int i = 0; i < array_size; i++) {
+    //     shared_data->array[i] = rand() % MAX_NUM_SIZE;
+    // }
 
-    return 0;
+    // return 0;
 }
 
 void merge_sort( int left, int right) {
