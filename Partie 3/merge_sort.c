@@ -1,5 +1,7 @@
 #include "merge_sort.h"
 
+int log_fd;
+
 int main(int argc, char *argv[]) {
     if (argc != 3) {
         fprintf(stderr, "Usage: %s <num_processes> <array_size>\n", argv[0]);
@@ -27,12 +29,30 @@ int main(int argc, char *argv[]) {
         shared_data->array[i] = rand() % MAX_NUM_SIZE;
     }
 
-    printf("Unsorted array: ");
-    show_array();
+    FILE *log_file = fopen("sorted_array.txt", "w");
+    fprintf(log_file, "Unsorted array: [");
+    for (int i = 0; i < array_size; i++) {
+        fprintf(log_file, "%d", shared_data->array[i]);
+        if (i != array_size - 1) {
+            fprintf(log_file, ", ");
+        }
+    }
+    fprintf(log_file, "]\n");
+    fclose(log_file);
 
+    gettimeofday(&start_time, NULL);
     execute_merge_sort(0, array_size - 1, num_processes);
+    gettimeofday(&end_time, NULL);
 
-    printf("Sorted array:\n");
+    double elapsed_time = (end_time.tv_sec - start_time.tv_sec) * 1000.0;
+    elapsed_time += (end_time.tv_usec - start_time.tv_usec) / 1000.0;
+
+    printf("Execution time: %.3f ms\n", elapsed_time);
+
+    log_file = fopen("sorted_array.txt", "a");
+    fprintf(log_file, "Execution time: %.3f ms\n", elapsed_time);
+    fclose(log_file);
+
     show_array();
 
     write_array_into_file();
@@ -59,6 +79,10 @@ void execute_merge_sort(int start, int end, int num_processes) {
         pipe(pipes[i]);
     }
 
+    int log_pipe[2];
+    pipe(log_pipe);
+    log_fd = log_pipe[1];
+
     for (int i = 0; i < num_processes; i++) {
         pid = fork();
         if (pid == 0) {
@@ -75,7 +99,8 @@ void execute_merge_sort(int start, int end, int num_processes) {
                     close(pipes[j][1]);
                 }
             }
-            
+            close(log_pipe[0]);
+
             printf("Child PID: %d sorting %d to %d\n", getpid(), left, right);
             merge_sort(left, right);
             printf("Child PID: %d finished.\n", getpid());
@@ -85,6 +110,7 @@ void execute_merge_sort(int start, int end, int num_processes) {
             write(pipes[i][1], &shared_data->array[left], segment_length * sizeof(int));
 
             close(pipes[i][1]);
+            close(log_fd);
 
             sem_post(mutex);
 
@@ -96,6 +122,8 @@ void execute_merge_sort(int start, int end, int num_processes) {
         close(pipes[i][1]);
     }
 
+    close(log_fd);
+
     for (int i = 0; i < num_processes; i++) {
         sem_wait(mutex);
     }
@@ -103,6 +131,13 @@ void execute_merge_sort(int start, int end, int num_processes) {
     for (int i = 0; i < num_processes; i++) {
         wait(NULL);
     }
+
+    FILE *log_file = fopen("sorted_array.txt", "a");
+    char log_message[10000];
+    while (read(log_pipe[0], log_message, sizeof(log_message)) > 0) {
+        fprintf(log_file, "%s", log_message);
+    }
+    fclose(log_file);
 
     int** sorted_segments = malloc(num_processes * sizeof(int*));
     int* segment_lengths = malloc(num_processes * sizeof(int));
@@ -207,6 +242,17 @@ void merge(int left, int mid, int right) {
         j++;
         k++;
     }
+    
+    char log_message[1024];
+    int len = snprintf(log_message, sizeof(log_message), "Start = %d, End = %d, sorted = [", left, right);
+    for (int idx = left; idx <= right; idx++) {
+        len += snprintf(log_message + len, sizeof(log_message) - len, "%d", shared_data->array[idx]);
+        if (idx != right) {
+            len += snprintf(log_message + len, sizeof(log_message) - len, ", ");
+        }
+    }
+    len += snprintf(log_message + len, sizeof(log_message) - len, "]\n");
+    write(log_fd, log_message, len);
 }
 
 void show_array(){
@@ -218,15 +264,20 @@ void show_array(){
 }
 
 void write_array_into_file(){
-    FILE *file = fopen("sorted_array.txt", "w");
+    FILE *file = fopen("sorted_array.txt", "a");
     if (file == NULL) {
         fprintf(stderr, "Error in fopen\n");
         exit(1);
     }
 
+    fprintf(file, "Sorted array: [");
     for (int i = 0; i < shared_data->size; i++) {
-        fprintf(file, "%d\n", shared_data->array[i]);
+        fprintf(file, "%d", shared_data->array[i]);
+        if (i != shared_data->size - 1) {
+            fprintf(file, ", ");
+        }
     }
+    fprintf(file, "]\n");
 
     fclose(file);
 }
