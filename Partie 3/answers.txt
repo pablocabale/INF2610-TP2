@@ -26,3 +26,9 @@ N = 16: 4.246 ms
 4. Si vous mettez en commentaires ("comment out") le code de journalisation, le programe est-il plus rapide
 ou lent? Quel est l’ordre de grandeur du changement en performance?
 - Environ 2 fois plus rapide car print le develloppement du merge prend beaucoup de ressources.
+
+5. Proposez deux approches pour améliorer la performance. Dans le fichier merge_sort_upgrade.c implémentez une des solutions que vous proposez. Quel est l’ordre de grandeur de l’amélioration observée
+de la performance?
+- Enlever la journalisation des merges. (Améliorer x2 la performance)
+- Utiliser pthread au lieu de la creation de nouveaux processus. Ceci pourrais etre beaucoup plus effectif car on
+peut en creer plus de threads que de processus pour s'occuper de plus de divisions du merge sort.
