@@ -5,3 +5,24 @@ coeurs disponibles. Quel sera l’impact de ce changement sur la performance de 
 - Ajouter plus de processus que le nombre de coeurs va empirer la performance de l'algorithme.
 Les processus extras doivent attendre leur tour ce qui enleve les avantages au parallelisme puis
 consomment plus de temps CPU.
+
+
+1. Générez des résultats de temps d’éxécution de votre algorithme parallèle et de l’algorithme initial.
+Assurez-vous que les résultats soient représentatifs de la réalité, sinon vos réponses aux questions suivantes ne seront pas évaluées. Vous devez générer des résultats pour les valeurs suivantes du nombre N
+de processus :
+
+N = 1 : 1.037 ms
+N = 2 : 0.542 ms (Extra car ma machine vituelle comporte 2 coeurs)
+N = 4 : 1.283 ms
+N = 8 : 2.581 ms
+N = 16: 4.246 ms
+
+2. Comparativement au programme initial, votre programme est combien de fois plus rapide ou lent?
+- Environ 2 fois plus vite (comparaison avec N = 2)
+
+3. Ce résultat vous surprend-il? Justifiez.
+- Non, car les processus permettent de diviser la tache et le merge sort est une tache divisible.  
+
+4. Si vous mettez en commentaires ("comment out") le code de journalisation, le programe est-il plus rapide
+ou lent? Quel est l’ordre de grandeur du changement en performance?
+- Environ 2 fois plus rapide car print le develloppement du merge prend beaucoup de ressources.
